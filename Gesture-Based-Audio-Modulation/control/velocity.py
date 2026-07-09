@@ -8,6 +8,9 @@ class VelocityFilter:
 
     def update(self , g_n , g_prev , dt):
 
+        #prev vel
+        v_prev = self.v_prev
+
         #raw vel
         v_raw = (g_n - g_prev) / dt
 
@@ -20,4 +23,4 @@ class VelocityFilter:
         # save state
         self.v_prev = v
 
-        return v
+        return v , v_prev
