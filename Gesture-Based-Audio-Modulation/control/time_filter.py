@@ -1,59 +1,60 @@
 import math
 
-from pandas.core.array_algos.take import take_nd
-
 
 class TimeFilter:
 
-    def __init__(self,
-                 eps_t = 1e-6,
-                 dt_safe = 0.05,
-                 lambda_dt = 0.1,
-                 dt_init = 0.016
-                 ):
+    def __init__(
+        self,
+        eps_t=1e-6,
+        dt_safe=0.05,
+        lambda_dt=0.1,
+        dt_init=0.016
+    ):
 
-        # parameters
-        self.eps_t = eps_t # e_t
-        self.dt_safe = dt_safe # t_safe
-        self.lambda_dt = lambda_dt # lambda
+        # Parameters
+        self.eps_t = eps_t
+        self.dt_safe = dt_safe
+        self.lambda_dt = lambda_dt
 
-        # state
-        self.prev_time = None # tn-1
-        self.dt_prev = dt_init # t-init
-        self.g_prev = 0.0 # gn-1
+        # State
+        self.prev_time = None
+        self.dt_prev = dt_init
+        self.g_prev = 0.0
 
-    def update(self,g_n,t_n):
-        # first frame
+    def update(self, g_n, t_n):
+
+        # First frame
         if self.prev_time is None:
             self.prev_time = t_n
             self.g_prev = g_n
-            return g_n , self.dt_prev
+            return g_n, g_n, self.dt_prev
 
-        # raw dt
-        dt_raw = t_n - self.prev_time # del_t
+        # Raw timestep
+        dt_raw = t_n - self.prev_time
 
-        # clamp dt
+        # Clamp timestep
         dt_raw = max(
             self.eps_t,
-            min(dt_raw , self.dt_safe)
+            min(dt_raw, self.dt_safe)
         )
 
-        # smooth dt
+        # Smooth timestep
         dt = (
             self.lambda_dt * self.dt_prev
             +
             (1 - self.lambda_dt) * dt_raw
         )
 
-        # sanitize dt
+        # Reject invalid gesture values
         if not math.isfinite(g_n):
             g_n = self.g_prev
 
-        # update state
+        # Save previous gesture before updating state
+        g_prev = self.g_prev
+
+        # Update state
         self.prev_time = t_n
         self.dt_prev = dt
         self.g_prev = g_n
 
-        return g_n,dt
-
-
+        return g_n, g_prev, dt
