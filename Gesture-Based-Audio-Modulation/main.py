@@ -1,16 +1,20 @@
 import time
-
+import pandas as pd
 from control.time_filter import TimeFilter
 from control.velocity import VelocityFilter
 from control.acceleration import AccelerationFilter
 from control.jerk import JerkLimiter
 from config.constants import GESTURE
-from logs.results import results
+from logs.results import res2
+from control.prediction import PredictionFilter
 
 tf = TimeFilter()
 vf = VelocityFilter()
 af = AccelerationFilter()
 jf = JerkLimiter()
+pf = PredictionFilter()
+
+indx = 0
 
 print("Running...\n")
 
@@ -41,14 +45,29 @@ for g in GESTURE:
         dt=dt
     )
 
-    results["frame"].append(i)
-    results["gesture"].append(g)
-    results["dt"].append(dt)
-    results["velocity"].append(v)
-    results["velocity_prev"].append(v_prev)
-    results["acc_raw"].append(a_raw)
-    results["acc"].append(a)
-    results["jerk"].append(j)
+    g_pred = pf.update(
+        g=g,
+        v=v,
+        a=a
+    )
+
+    res2["n"].append(indx)
+    res2["g"].append(g)
+    res2["g_prev"].append(g_prev)
+    res2["dt"].append(dt)
+    res2["v"].append(v)
+    res2["v_prev"].append(v_prev)
+    res2["a_raw"].append(a_raw)
+    res2["a"].append(a)
+    res2["j"].append(j)
+    res2["g_pred"].append(g_pred)
+
+    indx+=1
 
     time.sleep(0.02)
+
+df = pd.DataFrame(res2)
+df = df.round(4)
+df.to_csv("analysis/res2.csv", index=False)
+print(df)
 
