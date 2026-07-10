@@ -1,0 +1,7 @@
+EPS_T = 1e-6
+DT_SAFE = 0.05
+LAMBDA_DT = 0.1
+DT_INIT = 0.016
+
+V_MAX = 12.0
+J_MAX = 800.0

@@ -9,14 +9,4 @@ class AccelerationFilter:
     def update(self, v , v_prev , dt):
         #raw acc
         a_raw = (v - v_prev) / dt
-
-        #clamp acc
-        a = max(
-            -self.a_max,
-            min(a_raw , self.a_max)
-        )
-
-        #save state
-        self.a_prev = a
-
-        return a
+        return a_raw

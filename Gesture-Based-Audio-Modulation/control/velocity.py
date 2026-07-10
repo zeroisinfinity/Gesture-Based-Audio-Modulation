@@ -1,6 +1,6 @@
 class VelocityFilter:
 
-    def __init__(self, v_max=10.0):
+    def __init__(self, v_max=12.0):
         #max allowed vel
         self.v_max = v_max
         #prev vel (for acc)
